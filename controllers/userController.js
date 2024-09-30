@@ -1,5 +1,6 @@
 import {check,validationResult} from 'express-validator'
 import User from '../models/User.js'
+import {generarId} from '../helpers/tokens.js'
 
 export class AuthController {
 
@@ -25,36 +26,46 @@ export class AuthController {
         await check('password').isLength({min:6}).withMessage('El password debe ser de al menos 6 caracteres').run(req)
         await check('repit_password').equals(req.body.password).withMessage('El password no coincide').run(req)
 
-    //result
-    let result = validationResult(req)
-    if(!result.isEmpty()){
-        //errores
+        //result
+        let result = validationResult(req)
+        if(!result.isEmpty()){
+            //errores
+            return res.render('auth/registerUser',{
+                pagina:'Create account',
+                errores:result.array(),
+                name:{
+                    name:req.body.name,
+                    email:req.body.email
+                }
+            })
+        }
+        const {email,name,password} = req.body
+        //Check if user exist in database
+    const existeUsuario =   await User.findOne({where:{email}})
+    if(existeUsuario)
+    {
         return res.render('auth/registerUser',{
-            pagina:'Create account',
-            errores:result.array(),
-            name:{
+            pagina:'Create one',
+            errores:[{msg:'The user existe in databse'}],
+            user:{
                 name:req.body.name,
                 email:req.body.email
             }
-        })
-    }
-    const {email,name,password} = req.body
-    //Check if user exist in database
-const existeUsuario =   await User.findOne({where:{email}})
-if(existeUsuario){
-    return res.render('auth/registerUser',{
-        pagina:'Create one',
-        errores:[{msg:'The user existe in databse'}],
-        user:{
-            name:req.body.name,
-            email:req.body.email
-        }
-    })
-}
-console.log(existeUsuario)
-return;
+        })}
 
-  
+        await User.create({
+            name,
+            email,
+            password,
+            token:generarId()
+        })
+
+        res.render('templates/message',{
+            page:'Account created successfuly',
+            message:'We have sent email to confirm account, touch link'
+        })
+
+    
 
     }
 }

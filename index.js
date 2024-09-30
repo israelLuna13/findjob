@@ -7,6 +7,10 @@ const app = express()
 //enable read data on forms
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+//config middleware to process the data of the request http
+app.use(express.urlencoded({extended:true}))
+app.use(express.json())
 //connect database
 try {
     await db.authenticate();
@@ -24,7 +28,7 @@ app.set('views','./views');
 app.use(express.static('public'))
 
 //routing
-app.use('/user',userRoutes)
+app.use('/auth',userRoutes)
 
 //port and start project
 const port = 3000
