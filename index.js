@@ -1,6 +1,8 @@
 import express from 'express'
 import userRoutes from './routes/userRoute.js'
 import db from './config/dba.js'
+import cookieParser from 'cookie-parser';
+import csurf from 'csurf';
 
 const app = express()
 
@@ -11,6 +13,11 @@ app.use(express.json());
 //config middleware to process the data of the request http
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
+
+//enable cookieparser
+app.use(cookieParser())
+//enable csrf
+app.use(csurf({cookie:true}))
 //connect database
 try {
     await db.authenticate();
@@ -31,7 +38,7 @@ app.use(express.static('public'))
 app.use('/auth',userRoutes)
 
 //port and start project
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.listen(port,()=>{
     console.log(`The server is working on port ${port}`);

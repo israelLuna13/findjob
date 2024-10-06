@@ -25,7 +25,11 @@ const User = db.define('users',{
             user.password = await bcrypt.hash(user.password,salt)
         }
     }
-}
+})
 
-)
+//function custom
+//add at prototype
+User.prototype.checkPassword = function(password){
+    return bcrypt.compareSync(password, this.password)
+}
 export default User
