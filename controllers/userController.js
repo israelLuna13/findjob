@@ -64,7 +64,7 @@ export class AuthController {
         //redirect 
         return res.cookie('_token',token,{
             httpOnly:true
-        }).redirect('/my-vacancies')
+        }).redirect('/my-jobs')
     }
     static formRegister=(req,res)=>{
         res.render('auth/user-register',{

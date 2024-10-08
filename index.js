@@ -1,5 +1,6 @@
 import express from 'express'
 import userRoutes from './routes/userRoute.js'
+import jobsRoutes from './routes/jobsRoute.js'
 import db from './config/dba.js'
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
@@ -36,6 +37,7 @@ app.use(express.static('public'))
 
 //routing
 app.use('/auth',userRoutes)
+app.use('/',jobsRoutes)
 
 //port and start project
 const port = process.env.PORT || 3000
