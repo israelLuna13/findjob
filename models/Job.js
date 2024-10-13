@@ -17,6 +17,10 @@ const Job = db.define('jobs',{
         type:DataTypes.TEXT,
         allowNull:false
     },
+    company:{
+      type:DataTypes.STRING,
+      allowNull:false
+  },
     calle:{
         type:DataTypes.STRING,
         allowNull:false

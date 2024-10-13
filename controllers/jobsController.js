@@ -64,7 +64,7 @@ export class jobsController{
         }
 
         //all well
-        const {title,description,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
+        const {title,description,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
         const {id:userId} = req.user
         
@@ -74,6 +74,7 @@ export class jobsController{
             const jobSaved = await Job.create({
                 title,
                 description,
+                company,
                 calle,
                 lat,
                 lng,
@@ -152,12 +153,13 @@ export class jobsController{
             }
 
             try {
-                const {title,description,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
+                const {title,description,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
                 
                     job.set({
                     title,
                     description,
+                    company,
                     calle,
                     lat,
                     lng,
