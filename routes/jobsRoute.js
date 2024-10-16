@@ -26,8 +26,10 @@ router.post('/jobs/edit/:id',protectRute,
     body('lat').notEmpty().withMessage('Choose direction'),
     body('skill').isArray({ min: 1 }).withMessage('Choose at least one skill'),    
     body('skill.*').notEmpty().withMessage('Invalid skill selection',
-        ),jobsController.saveChanges
+        ),jobsController.saveChanges)
+router.post('/jobs/delete/:id',protectRute,jobsController.delete)
 
-)
+// public area
+router.get('/job/:id',jobsController.showJob)
 
 export default router

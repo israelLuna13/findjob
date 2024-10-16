@@ -2,7 +2,8 @@ import path from 'path'
 export default{
     mode:'development',
     entry:{
-        mapa:'./src/js/mapa.js'
+        mapa:'./src/js/mapa.js',
+        showMap:'./src/js/showMap.js'
 
     },
     output:{

@@ -18,7 +18,8 @@ export class jobsController{
        
         res.render('jobs/admin',{
             page:'My Jobs',
-            jobs
+            jobs,
+            csrfToken:req.csrfToken()
         })
     }
     static  create = async(req,res)=>{
@@ -175,5 +176,48 @@ export class jobsController{
                 console.log(error);   
             }
         }
-    
+
+        static delete = async(req,res)=>
+        {
+            const {id} = req.params
+            const job = await Job.findByPk(id)
+
+            if(!job)
+            {
+                return res.redirect('/my-jobs')
+            }
+
+            if(job.userId.toString() !== req.user.id.toString()){
+                return res.redirect('/my-jobs')
+            }
+            await job.destroy()
+            res.redirect('/my-jobs')
+        }
+
+        static showJob = async(req,res)=>{
+            const {id} = req.params
+            const job = await Job.findByPk(
+                id,
+                {
+                    include:[
+                        {model:Category,as:'category'},
+                        {model:Price,as:'price'},
+                        {model:Skill,as:'skill'}
+                    ]
+                }
+            )
+
+            if(!job){
+                return res.redirect('/404')
+            }
+            console.log(job);
+            
+
+            res.render('jobs/show',{
+                job,
+                page:job.title
+            })
+
+
+        }
 }
