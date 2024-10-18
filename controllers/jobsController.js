@@ -4,23 +4,54 @@ import {Price,Category,Job,Skill} from '../models/index.js'
 import { validationResult } from "express-validator"
 export class jobsController{
     static admin = async(req,res)=>{
-        const {id} = req.user
-        const jobs = await Job.findAll({
-            where:{
-                userId:id
-            },
-            include:[
-                {model:Category,as:'category'},
-                {model:Price,as:'price'},
-                {model:Skill,as:'skill'}
-            ]
-        })
-       
-        res.render('jobs/admin',{
-            page:'My Jobs',
-            jobs,
-            csrfToken:req.csrfToken()
-        })
+        //query string
+         const {page:currentPage} = req.query
+        //regular expresion
+          const regex = /^[0-9]$/
+          // if the expresion it is not true
+          if(!regex .test(currentPage)){
+            return res.redirect('/my-jobs?page=1')
+          }
+          try {
+            const {id} = req.user
+            const limit = 5 // jobs by page
+            const offset = (currentPage * limit) - limit 
+            const [jobs,total] = await Promise.all([
+                Job.findAll({
+                    limit,
+                    offset,
+                    where:{
+                        userId:id
+                    },
+                    include:[
+                        {model:Category,as:'category'},
+                        {model:Price,as:'price'},
+                        {model:Skill,as:'skill'}
+                    ]
+                }),
+
+                Job.count({
+                    where:{
+                        userId:id
+                    }
+                })
+            ])
+
+            res.render('jobs/admin',{
+                page:'My jobs',
+                jobs,
+                csrfToken:req.csrfToken(),
+                pages:Math.ceil(total/limit),
+                currentPage:Number(currentPage),
+                offset,
+                limit,
+                total
+
+            })
+          } catch (error) {
+            console.log(error);
+            
+          }
     }
     static  create = async(req,res)=>{
         const [categorys,skills,prices] = await Promise.all([
