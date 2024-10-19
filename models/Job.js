@@ -13,9 +13,21 @@ const Job = db.define('jobs',{
         type:DataTypes.STRING(100),
         allowNull:false
     },
+    benefit:{
+        type:DataTypes.TEXT,
+        allowNull:false
+    },
     description:{
         type:DataTypes.TEXT,
         allowNull:false
+    },
+    shift:{
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    language:{
+      type:DataTypes.STRING,
+      allowNull:false
     },
     company:{
       type:DataTypes.STRING,

@@ -1,6 +1,6 @@
 
 import {Price,Category,Job,Skill} from '../models/index.js'
-
+import { shifts,languages } from '../Data/localData.js'
 import { validationResult } from "express-validator"
 export class jobsController{
     static admin = async(req,res)=>{
@@ -37,6 +37,8 @@ export class jobsController{
                 })
             ])
 
+            console.log(jobs);
+            
             res.render('jobs/admin',{
                 page:'My jobs',
                 jobs,
@@ -54,12 +56,12 @@ export class jobsController{
           }
     }
     static  create = async(req,res)=>{
+
         const [categorys,skills,prices] = await Promise.all([
             Category.findAll(),
             Skill.findAll(),
             Price.findAll(),
         ])
-        console.log(skills);
         
         res.render('jobs/create',{
             csrfToken:req.csrfToken(),
@@ -67,7 +69,9 @@ export class jobsController{
             page:'Create job',
             categorys,
             skills,
-            prices
+            prices,
+            shifts,
+            languages
 
         })
     }
@@ -81,8 +85,6 @@ export class jobsController{
                 Price.findAll(),
                 Skill.findAll()
             ]);
-            console.log(skills);
-
 
             return res.render('jobs/create',{
                 page:'Create job',
@@ -91,12 +93,14 @@ export class jobsController{
                 prices,
                 skills,
                 errores:result.array(),
-                data:req.body
+                data:req.body,
+                shifts,
+                languages
             })
         }
 
         //all well
-        const {title,description,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
+        const {title,description,benefit,shift,language,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
         const {id:userId} = req.user
         
@@ -106,6 +110,9 @@ export class jobsController{
             const jobSaved = await Job.create({
                 title,
                 description,
+                benefit,
+                shift,
+                language,
                 company,
                 calle,
                 lat,
@@ -168,6 +175,8 @@ export class jobsController{
                     categorys,
                     prices,
                     skills,
+                    languages,
+                    shifts,
                     errores:result.array(),
                     data:req.body
                 })
@@ -185,12 +194,15 @@ export class jobsController{
             }
 
             try {
-                const {title,description,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
+                const {title,description,benefit,shift,language,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
                 
                     job.set({
                     title,
                     description,
+                    benefit,
+                    shift,
+                    language,
                     company,
                     calle,
                     lat,
