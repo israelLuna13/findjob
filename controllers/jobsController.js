@@ -1,7 +1,8 @@
 
-import {Price,Category,Job,Skill} from '../models/index.js'
+import {Price,Category,Job,Skill, Message, User} from '../models/index.js'
 import { shifts,languages } from '../Data/localData.js'
 import { validationResult } from "express-validator"
+import { formatearFecha, isEmployer } from '../helpers/index.js'
 export class jobsController{
     static admin = async(req,res)=>{
         //query string
@@ -26,7 +27,8 @@ export class jobsController{
                     include:[
                         {model:Category,as:'category'},
                         {model:Price,as:'price'},
-                        {model:Skill,as:'skill'}
+                        {model:Skill,as:'skill'},
+                        {model:Message,as:'messages'},
                     ]
                 }),
 
@@ -73,6 +75,28 @@ export class jobsController{
             shifts,
             languages
 
+        })
+    }
+    static addResume = async(req,res)=>{
+        const {id} = req.params
+        
+        const job = await Job.findByPk(id)
+        
+        if(!job){
+            return res.redirect('my-jobs')
+        }
+
+        if(!job.published){
+            return res.redirect('/my-jobs')
+        }
+        
+        // if(req.user.id.toString() !== job.userId.toString()){
+        //     return res.redirect('/my-jobs')
+        // }
+        res.render('jobs/add-resume',{
+            page:`Add resume at ${job.title}`,
+            csrfToken:req.csrfToken(),
+            job
         })
     }
 
@@ -252,15 +276,79 @@ export class jobsController{
 
             if(!job){
                 return res.redirect('/404')
-            }
-            console.log(job);
-            
+            }            
 
             res.render('jobs/show',{
                 job,
-                page:job.title
+                page:job.title,
+                csrfToken:req.csrfToken(),
+                user:req.user,
+                isEmployer:isEmployer(req.user?.id,job.userId)
+
             })
 
 
+        }
+
+        static sentMessage = async(req,res)=>{
+            const {id} = req.params
+            console.log(id);
+            
+            const job = await Job.findByPk(
+                id,
+                {
+                    include:[
+                        {model:Category,as:'category'},
+                        {model:Price,as:'price'},
+                        {model:Skill,as:'skill'}
+                    ]
+                }
+            )
+            if(!job){
+                return res.redirect('/404')
+            }
+            let result = validationResult(req)
+            if(!result.isEmpty())
+            {
+                return res.render("jobs/show",{
+                    job,
+                    page:job.title,
+                    csrfToken: req.csrfToken(),
+                    user:req.user,
+                    isEmployer:isEmployer(req.user?.id,job.userId),
+                    errores: result.array(),
+                })
+            }
+            const { message } = req.body;
+            const { id: jobId } = req.params;
+            const { id: userId } = req.user;
+             await Message.create({
+                message,
+                jobId,
+                userId
+             })
+             res.redirect('/')
+        }
+
+        static lookMessage = async(req,res)=>{
+            const {id} = req.params
+
+            const job = await Job.findByPk(id,{
+                include:[
+                    {
+                        model:Message,
+                        as:'messages',
+                        include:[{model:User.scope("deletePassword"),as:"user"}]
+                    }
+                ]
+            })
+            if(!job){
+                return res.redirect('/my-jobs')
+            }
+            res.render("jobs/messages",{
+                page:'Messages',
+                message:job.messages,
+                formatearFecha,
+            })
         }
 }

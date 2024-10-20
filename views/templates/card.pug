@@ -1,0 +1,15 @@
+div(class="bg-white shadow rounded-lg")
+    div(class="p-5 space-y-2")
+        h3(class="text-2xl font-bold")= job.title
+        p(class="text-sm text-gray-600") Skills:
+        p(class="text-sm text-gray-600")= job.skill.name
+
+        p(class="text-sm text-gray-600") Company:
+        p(class="text-sm text-gray-600")= job.company
+        
+        p(class="text-sm text-gray-600") Price:
+        p(class="text-sm text-gray-600")= job.price.name
+
+        a(href=`/job/${job.id}` class="bg-blue-600 w-full text-center block font-bold text-white p-2 uppercase rounded") look job
+        
+        

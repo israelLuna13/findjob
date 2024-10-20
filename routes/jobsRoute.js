@@ -2,6 +2,7 @@ import express from 'express'
 import {jobsController} from '../controllers/jobsController.js'
 import { body } from 'express-validator'
 import protectRute from '../middleware/protecRute.js'
+import identifyUser from '../middleware/identifyUser.js'
 const router = express.Router()
 
 router.get('/my-jobs',protectRute,jobsController.admin)
@@ -31,9 +32,22 @@ router.post('/jobs/edit/:id',protectRute,
     body('lat').notEmpty().withMessage('Choose direction'),
     body('skill').notEmpty().withMessage('Choose at least one skill'),
     jobsController.saveChanges)
+
+
 router.post('/jobs/delete/:id',protectRute,jobsController.delete)
 
 // public area
-router.get('/job/:id',jobsController.showJob)
+router.get('/jobs/add-resume/:id',jobsController.addResume)
+router.post('/jobs/add-resume/:id',protectRute,(req,res)=>{
+    console.log('Subiendo pdf...');
+    
+})
+router.get('/job/:id',identifyUser,jobsController.showJob)
+
+router.post('/job/:id',identifyUser, body('message').isLength({min:10}).withMessage('The message is required') ,jobsController.sentMessage)
+router.get('/messages/:id',
+    protectRute,jobsController.lookMessage
+)  
+
 
 export default router

@@ -3,7 +3,10 @@ export default{
     mode:'development',
     entry:{
         mapa:'./src/js/mapa.js',
-        showMap:'./src/js/showMap.js'
+        showMap:'./src/js/showMap.js',
+        mapHome:'./src/js/mapHome.js',
+        addResume:'./src/js/addResume.js',
+
 
     },
     output:{
