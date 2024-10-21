@@ -3,6 +3,7 @@ import {jobsController} from '../controllers/jobsController.js'
 import { body } from 'express-validator'
 import protectRute from '../middleware/protecRute.js'
 import identifyUser from '../middleware/identifyUser.js'
+import upload from '../middleware/uploadResume.js'
 const router = express.Router()
 
 router.get('/my-jobs',protectRute,jobsController.admin)
@@ -35,16 +36,16 @@ router.post('/jobs/edit/:id',protectRute,
 
 
 router.post('/jobs/delete/:id',protectRute,jobsController.delete)
+router.put('/jobs/:id,',protectRute,jobsController.changeState)
 
 // public area
-router.get('/jobs/add-resume/:id',jobsController.addResume)
-router.post('/jobs/add-resume/:id',protectRute,(req,res)=>{
-    console.log('Subiendo pdf...');
-    
-})
-router.get('/job/:id',identifyUser,jobsController.showJob)
 
-router.post('/job/:id',identifyUser, body('message').isLength({min:10}).withMessage('The message is required') ,jobsController.sentMessage)
+router.get('/jobs/:id',identifyUser,jobsController.showJob)
+
+router.get('/jobs/add-resume/:id',protectRute,jobsController.addResume)
+router.post('/jobs/add-resume/:id',protectRute,upload.single('resume'),jobsController.saveResume)
+
+router.post('/jobs/:id',identifyUser, body('message').isLength({min:10}).withMessage('The message is required') ,jobsController.sentMessage)
 router.get('/messages/:id',
     protectRute,jobsController.lookMessage
 )  

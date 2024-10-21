@@ -6,6 +6,7 @@ export default{
         showMap:'./src/js/showMap.js',
         mapHome:'./src/js/mapHome.js',
         addResume:'./src/js/addResume.js',
+        changeState:'./src/js/changeState.js',
 
 
     },

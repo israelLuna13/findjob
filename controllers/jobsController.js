@@ -1,5 +1,5 @@
 
-import {Price,Category,Job,Skill, Message, User} from '../models/index.js'
+import {Price,Category,Job,Skill, Message, User, Resume} from '../models/index.js'
 import { shifts,languages } from '../Data/localData.js'
 import { validationResult } from "express-validator"
 import { formatearFecha, isEmployer } from '../helpers/index.js'
@@ -99,6 +99,34 @@ export class jobsController{
             job
         })
     }
+    static saveResume=async(req,res,next)=>{
+        const {id} = req.params
+        const job = await Job.findByPk(id)
+        if(!job)
+            return res.redirect('/my-jobs')
+        console.log("SI EXISTE EL JOB");
+        
+        // if(job.published)
+        //     return res.redirect('/my-jobs')
+        // console.log("SI ESTA PUBLICADO");
+        
+        try {
+            const resume= req.file.filename
+            console.log(resume);
+            
+            const { id: jobId } = req.params;
+            const { id: userId } = req.user;
+            await Resume.create({
+                resume,
+                jobId,
+                userId
+             })
+             
+            next()
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     static  save = async(req,res)=>
     {
@@ -131,7 +159,7 @@ export class jobsController{
 
         try {
             
-            const jobSaved = await Job.create({
+             jobSaved = await Job.create({
                 title,
                 description,
                 benefit,
@@ -274,9 +302,10 @@ export class jobsController{
                 }
             )
 
-            if(!job){
+            if(!job || !job.published){
                 return res.redirect('/404')
-            }            
+            }    
+            
 
             res.render('jobs/show',{
                 job,
@@ -290,10 +319,10 @@ export class jobsController{
 
         }
 
+        //este metodo va a apuntar a otra vista
         static sentMessage = async(req,res)=>{
             const {id} = req.params
-            console.log(id);
-            
+
             const job = await Job.findByPk(
                 id,
                 {
@@ -329,7 +358,6 @@ export class jobsController{
              })
              res.redirect('/')
         }
-
         static lookMessage = async(req,res)=>{
             const {id} = req.params
 
@@ -350,5 +378,23 @@ export class jobsController{
                 message:job.messages,
                 formatearFecha,
             })
+        }
+        
+        static changeState = async(req,res)=>{
+            const {id} = req.params
+
+            const job = await Job.findByPk(id)
+
+            if(!job)
+                return res.redirect("/my-jobs")
+            if(job.userId.toString() !== res.user.id.toString())
+                return res.redirect("/my-jobs")
+            
+            job.published =!job.published
+            await job.save()
+             res.json({
+                result:true
+             })
+
         }
 }

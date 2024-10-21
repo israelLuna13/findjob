@@ -31,7 +31,7 @@ block contenido
                                 h2(class="text-2xl leading-6 font-bold text-gray-900") Description
                                 p= job.description
             aside(class="md:w-1/3 bg-gray-800 shadow rounded-lg")
-                h3(class="text-center py-10 leading-6 text-2xl font-bold text-white") Ubicacion 
+                h3(class="text-center py-11 leading-6 text-2xl font-bold text-white") Ubicacion 
                 div(class="h-96" id="mapa")
                     p(id="lat" class="hidden")=job.lat 
                     p(id="lng" class="hidden")=job.lng
@@ -43,22 +43,19 @@ block contenido
                     h3(class="text-2xl text-center my-10 font-extrabold text-white") Employer
 
                     if user
-                        a(href=`/jobs/add-resume/${job.id}` class=" text-white font-bold uppercase text-sm w-full p-2 cursor-pointer") Add resume
+                        a(href=`/jobs/add-resume/${job.id}` class=" text-white font-bold uppercase text-sm cursor-pointer py-2 px-10 rounded-sm bg-blue-600 block mx-auto text-center") Aplicar to job
 
-                        form(method="POST")
-                            input(type="hidden" name="_csrf" value=csrfToken)
-
-                            div.space-y-5
-                                label(for="message" class="text-white") Message
-                                textarea(name="message" id="message" class="w-full px-2 border border-gray-300 rounded-lg shadow placeholder-gray-400" placeholder="Your message here") 
-                                input(type="submit" value="Sent message" class="bg-blue-600 text-white font-bold uppercase text-sm w-full p-2 cursor-pointer")
                     else
                         div(class="flex flex-col items-center justify-center gap-2")
                             p.text-center If you want to talk with the employer 
                             a(href="/auth/create" class="text-blue-600") you most create an accunt
 
-
 block scripts
     script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js")
     script(src="/js/showMap.js")
 
+
+                            //- div.space-y-5
+                            //-     label(for="message" class="text-white") Message
+                            //-     textarea(name="message" id="message" class="w-full px-2 border border-gray-300 rounded-lg shadow placeholder-gray-400" placeholder="Your message here") 
+                            //-     input(type="submit" value="Sent message" class="bg-blue-600 text-white font-bold uppercase text-sm w-full p-2 cursor-pointer")
