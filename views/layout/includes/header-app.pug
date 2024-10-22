@@ -3,9 +3,20 @@ header.bg-blue-600.py-4
          a(href="/") 
             h1.text-2xl.text-white.font-extrabold.text-center Find 
                 span.font-normal Job
-         nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white")
-            a(href="/auth/register") Create account
-            a(href="/auth/login") Login
+         
+         if !userInSession
+            nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white")
+                a(href="/auth/register") Create account
+                a(href="/auth/login") Login
+         else
+            nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white")
+                a(href="/my-jobs") My jobs
+                form(method="POST" action="auth/logout") 
+                    input(type="hidden" name="_csrf" value=csrfToken)
+                    input(type="submit" class="bg-blue-800 py-2 px-10 rounded-lg cursor-pointer" value="Logout")
+
+
+            
     div(class="bf-blue-700 py-5 hidden lg:block")
        div(class="container mx-auto flex justify-between")
             nav(class="flex gap-4 items-center")

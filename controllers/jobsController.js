@@ -3,6 +3,7 @@ import {Price,Category,Job,Skill, Message, User, Resume} from '../models/index.j
 import { shifts,languages } from '../Data/localData.js'
 import { validationResult } from "express-validator"
 import { formatearFecha, isEmployer } from '../helpers/index.js'
+import { resumeUpload } from '../helpers/emails.js'
 export class jobsController{
     static admin = async(req,res)=>{
         //query string
@@ -28,7 +29,7 @@ export class jobsController{
                         {model:Category,as:'category'},
                         {model:Price,as:'price'},
                         {model:Skill,as:'skill'},
-                        {model:Message,as:'messages'},
+                        {model:Resume,as:'resumes'},
                     ]
                 }),
 
@@ -37,10 +38,7 @@ export class jobsController{
                         userId:id
                     }
                 })
-            ])
-
-            console.log(jobs);
-            
+            ])            
             res.render('jobs/admin',{
                 page:'My jobs',
                 jobs,
@@ -101,10 +99,13 @@ export class jobsController{
     }
     static saveResume=async(req,res,next)=>{
         const {id} = req.params
-        const job = await Job.findByPk(id)
+        const job = await Job.findByPk(id,{
+            include:[
+                {model:User,as:'user'}
+            ]
+        })
         if(!job)
             return res.redirect('/my-jobs')
-        console.log("SI EXISTE EL JOB");
         
         // if(job.published)
         //     return res.redirect('/my-jobs')
@@ -112,7 +113,6 @@ export class jobsController{
         
         try {
             const resume= req.file.filename
-            console.log(resume);
             
             const { id: jobId } = req.params;
             const { id: userId } = req.user;
@@ -121,6 +121,19 @@ export class jobsController{
                 jobId,
                 userId
              })
+
+             const {title} = job
+             const {name} = req.user
+             const {email}=job.user
+             const {name:employer} = job.user
+
+
+             resumeUpload({
+                title,
+                name,
+                employer,
+                email
+            })
              
             next()
         } catch (error) {
@@ -198,7 +211,6 @@ export class jobsController{
             Price.findAll(),
             Skill.findAll()
         ]);
-        console.log(job);
 
         res.render('jobs/edit',{
             page:`Edit ${job.title}`,
@@ -219,7 +231,6 @@ export class jobsController{
                     Price.findAll(),
                     Skill.findAll()
                 ]);
-                console.log(skills);
 
                 return res.render('jobs/edit',{
                     page:'Edit job',
@@ -379,6 +390,29 @@ export class jobsController{
                 formatearFecha,
             })
         }
+
+        static lookResumes=async(req,res)=>{
+            const {id} = req.params
+
+            const job = await Job.findByPk(id,{
+                include:[
+                    {
+                        model:Resume,
+                        as:'resumes',
+                        include:[{model:User.scope("deletePassword"),as:"user"}]
+                    }
+                ]
+            })
+            if(!job){
+                return res.redirect('/my-jobs')
+            }
+            res.render("jobs/resumes",{
+                page:'Resumes',
+                resume:job.resumes,
+                formatearFecha,
+            })
+
+        }
         
         static changeState = async(req,res)=>{
             const {id} = req.params
@@ -387,7 +421,9 @@ export class jobsController{
 
             if(!job)
                 return res.redirect("/my-jobs")
-            if(job.userId.toString() !== res.user.id.toString())
+            console.log(res.user);
+            
+            if(job.userId.toString() !== req.user.id.toString())
                 return res.redirect("/my-jobs")
             
             job.published =!job.published

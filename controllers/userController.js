@@ -7,10 +7,15 @@ import bcrypt from 'bcrypt'
 export class AuthController {
 
     static formLogin=(req,res)=>{
-        res.render('auth/user-login',{
-            csrfToken:req.csrfToken(),
-            page:'Login'
-        })
+        if(!req.user)
+        {
+            res.render('auth/user-login',{
+                csrfToken:req.csrfToken(),
+                page:'Login'
+            })
+
+        }
+        res.redirect('/my-jobs')
     }
     static autenticateUser=async(req,res)=>{
         await check("email")
@@ -67,11 +72,15 @@ export class AuthController {
         }).redirect('/my-jobs')
     }
     static formRegister=(req,res)=>{
-        res.render('auth/user-register',{
-            page:'Crate account',
-            csrfToken:req.csrfToken()
-
-        })
+        if(!req.user)
+        {
+            res.render('auth/user-register',{
+                page:'Crate account',
+                csrfToken:req.csrfToken()
+            })
+        }
+        res.redirect('/my-jobs')
+        
     }
     static formForgotPassword=(req,res)=>{
         res.render('auth/user-recover-password',{
@@ -80,6 +89,10 @@ export class AuthController {
         })
     }
 //-----------------
+    static logout=(req,res)=>{
+        return res.clearCookie('_token').status(200).redirect('/auth/login')
+    }
+
     static register = async(req,res)=>{
         await check('name').notEmpty().withMessage('Name is required').run(req)
         await check('email').isEmail().withMessage('Write email correct').run(req)
@@ -120,7 +133,6 @@ export class AuthController {
             password,
             token:generarId()
         })
-        console.log(email);
         
 
         //send email

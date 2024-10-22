@@ -1,13 +1,15 @@
 import express from "express"
 import { AuthController } from "../controllers/userController.js";
+import identifyUser from "../middleware/identifyUser.js";
 const router = express.Router();
 
 //routes
 //login
-router.get('/login',AuthController.formLogin)
+router.get('/login',identifyUser,AuthController.formLogin)
 router.post('/login',AuthController.autenticateUser)
+router.post('/logout',AuthController.logout)
 //register
-router.get('/register',AuthController.formRegister)
+router.get('/register',identifyUser,AuthController.formRegister)
 router.post('/register',AuthController.register)
 //token
 router.get('/confirm/:token',AuthController.confirm)

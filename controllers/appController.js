@@ -25,6 +25,8 @@ export class AppController{
             }),
 
         ])
+        let userInSession
+        (req.user != null ? userInSession = true: userInSession = false)
 
         res.render('home',{
             page:'Home',
@@ -32,7 +34,8 @@ export class AppController{
             prices,
             skills,
             jobs,
-            csrfToken:req.csrfToken()
+            csrfToken:req.csrfToken(),
+            userInSession
 
         })
 

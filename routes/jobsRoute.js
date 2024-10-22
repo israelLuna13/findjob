@@ -36,7 +36,7 @@ router.post('/jobs/edit/:id',protectRute,
 
 
 router.post('/jobs/delete/:id',protectRute,jobsController.delete)
-router.put('/jobs/:id,',protectRute,jobsController.changeState)
+router.put('/jobs/:id',protectRute,jobsController.changeState)
 
 // public area
 
@@ -46,9 +46,8 @@ router.get('/jobs/add-resume/:id',protectRute,jobsController.addResume)
 router.post('/jobs/add-resume/:id',protectRute,upload.single('resume'),jobsController.saveResume)
 
 router.post('/jobs/:id',identifyUser, body('message').isLength({min:10}).withMessage('The message is required') ,jobsController.sentMessage)
-router.get('/messages/:id',
-    protectRute,jobsController.lookMessage
-)  
+router.get('/messages/:id',protectRute,jobsController.lookMessage)  
+router.get('/resumes/:id',protectRute,jobsController.lookResumes)  
 
 
 export default router

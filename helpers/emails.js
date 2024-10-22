@@ -62,7 +62,34 @@ const emailForgotPassword = async(data)=>
                  `
         })
     }
+
+    const resumeUpload = async(data)=>
+        {
+            const transport = nodemailer.createTransport({
+                host: process.env.EMAIL_HOST,
+                port: process.env.EMAIL_PORT,
+                auth: {
+                  user: process.env.EMAIL_USER,
+                  pass: process.env.EMAIL_PASS
+                }
+            });
+        
+            const {title,name,employer,email}=data
+                    
+            //send email
+            await transport.sendMail({
+                from:'FindJob.com',
+                to:email,
+                subject:'Resume upload FindJob.com',
+                text:'Resume upload FindJob.com',
+                html: `
+                        <p>Hello ${employer},The user ${name} has upload resume to job ${title} FindJob.com</p>
+                        <p>You can you ingnore the message</p> 
+                     `
+            })
+        }
 export {
     registerEmail,
-    emailForgotPassword
+    emailForgotPassword,
+    resumeUpload
 }
