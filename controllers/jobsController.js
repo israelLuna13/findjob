@@ -1,6 +1,5 @@
 
-import {Price,Category,Job,Skill, Message, User, Resume} from '../models/index.js'
-import { shifts,languages } from '../Data/localData.js'
+import {Price,Category,Job,Skill, Message, User, Resume, Shift, Language} from '../models/index.js'
 import { validationResult } from "express-validator"
 import { formatearFecha, isEmployer } from '../helpers/index.js'
 import { resumeUpload } from '../helpers/emails.js'
@@ -29,6 +28,8 @@ export class jobsController{
                         {model:Category,as:'category'},
                         {model:Price,as:'price'},
                         {model:Skill,as:'skill'},
+                        {model:Language,as:'language'},
+                        {model:Shift,as:'shift'},
                         {model:Resume,as:'resumes'},
                     ]
                 }),
@@ -57,10 +58,12 @@ export class jobsController{
     }
     static  create = async(req,res)=>{
 
-        const [categorys,skills,prices] = await Promise.all([
+        const [categorys,skills,prices,languages,shifts] = await Promise.all([
             Category.findAll(),
             Skill.findAll(),
             Price.findAll(),
+            Language.findAll(),
+            Shift.findAll(),
         ])
         
         res.render('jobs/create',{
@@ -77,8 +80,16 @@ export class jobsController{
     }
     static addResume = async(req,res)=>{
         const {id} = req.params
-        
+        // const {id:idUser} = req.user
+        // let aplicated = false
+        // const resume = await Resume.findByPk(idUser)
         const job = await Job.findByPk(id)
+
+        // if(idUser == resume.userId && id == resume.jobId){
+        //     aplicated = true
+
+        // }
+       
         
         if(!job){
             return res.redirect('my-jobs')
@@ -99,6 +110,7 @@ export class jobsController{
     }
     static saveResume=async(req,res,next)=>{
         const {id} = req.params
+ 
         const job = await Job.findByPk(id,{
             include:[
                 {model:User,as:'user'}
@@ -127,7 +139,7 @@ export class jobsController{
              const {email}=job.user
              const {name:employer} = job.user
 
-
+            //sent email to employer
              resumeUpload({
                 title,
                 name,
@@ -141,14 +153,17 @@ export class jobsController{
         }
     }
 
+    //arreglar : insertar id del lenguage del trabajo y del tipo de trabajo
     static  save = async(req,res)=>
     {
         let result = validationResult(req)
         if(!result.isEmpty()){
-            const [categorys,prices,skills] = await Promise.all([
+            const [categorys,prices,skills,shifts,languages] = await Promise.all([
                 Category.findAll(),
                 Price.findAll(),
-                Skill.findAll()
+                Skill.findAll(),
+                Shift.findAll(),
+                Language.findAll(),
             ]);
 
             return res.render('jobs/create',{
@@ -165,19 +180,17 @@ export class jobsController{
         }
 
         //all well
-        const {title,description,benefit,shift,language,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
+        const {title,description,benefit,shift:shiftId,language:languageId,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
         const {id:userId} = req.user
         
 
         try {
             
-             jobSaved = await Job.create({
+              await Job.create({
                 title,
                 description,
                 benefit,
-                shift,
-                language,
                 company,
                 calle,
                 lat,
@@ -186,9 +199,12 @@ export class jobsController{
                 priceId,
                 skillId,
                 userId,
+                shiftId,
+                languageId,
                 published:true
             })
            // const {id} = jobSaved
+
             res.redirect('/my-jobs')
         } catch (error) {
             console.log(error);   
@@ -197,7 +213,16 @@ export class jobsController{
 
     static edit = async (req,res)=>{
         const {id} = req.params
-        const job = await Job.findByPk(id)
+        const job = await Job.findByPk(id,{
+            include:[
+                {model:User,as:'user'},
+                {model:Price,as:'price'},
+                {model:Category,as:'category'},
+                {model:Skill,as:'skill'},
+                {model:Shift,as:'shift'},
+                {model:Language,as:'language'},
+            ]
+        })        
 
         if(!job){
             return res.redirect('/my-jobs')
@@ -206,19 +231,26 @@ export class jobsController{
             return res.redirect('/my-jobs')
         }
 
-        const [categorys,prices,skills] = await Promise.all([
+        const [categorys,prices,skills,shifts,languages] = await Promise.all([
             Category.findAll(),
             Price.findAll(),
-            Skill.findAll()
+            Skill.findAll(),
+            Shift.findAll(),
+            Language.findAll(),
         ]);
+
+        console.log(job);
+        
 
         res.render('jobs/edit',{
             page:`Edit ${job.title}`,
             csrfToken:req.csrfToken(),
             categorys,
             prices,
-            skills
-            ,data:job
+            skills,
+            data:job,
+            languages,
+            shifts
         })
     }
 
@@ -226,10 +258,12 @@ export class jobsController{
         {
             let result = validationResult(req)
             if(!result.isEmpty()){
-                const [categorys,prices,skills] = await Promise.all([
+                const [categorys,prices,skills,shifts,languages] = await Promise.all([
                     Category.findAll(),
                     Price.findAll(),
-                    Skill.findAll()
+                    Skill.findAll(),
+                    Shift.findAll(),
+                    Language.findAll(),
                 ]);
 
                 return res.render('jobs/edit',{
@@ -257,22 +291,22 @@ export class jobsController{
             }
 
             try {
-                const {title,description,benefit,shift,language,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
+                const {title,description,benefit,shift:shiftId,language:languageId,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
                 
                     job.set({
                     title,
                     description,
                     benefit,
-                    shift,
-                    language,
                     company,
                     calle,
                     lat,
                     lng,
                     categoryId,
                     priceId,
-                    skillId
+                    skillId,
+                    shiftId,
+                    languageId
                 })
 
                 await job.save()
@@ -302,32 +336,49 @@ export class jobsController{
 
         static showJob = async(req,res)=>{
             const {id} = req.params
+            const {id:idUser} = req.user
+            let aplicated = false
+            const resume = await Resume.findOne({
+                where:{
+                    jobId:id
+                }
+            })
+            
             const job = await Job.findByPk(
                 id,
                 {
                     include:[
                         {model:Category,as:'category'},
                         {model:Price,as:'price'},
-                        {model:Skill,as:'skill'}
+                        {model:Skill,as:'skill'},
+                        {model:Shift,as:'shift'},
+                        {model:Language,as:'language'},
                     ]
                 }
             )
+            if(resume){
+                if(idUser == resume.userId && id == resume.jobId){
+                    aplicated = true
+                }
+            }
+            
+           
 
             if(!job || !job.published){
                 return res.redirect('/404')
             }    
+            let userInSession
+            (req.user != null ? userInSession = true: userInSession = false)
             
-
             res.render('jobs/show',{
                 job,
                 page:job.title,
                 csrfToken:req.csrfToken(),
                 user:req.user,
-                isEmployer:isEmployer(req.user?.id,job.userId)
-
+                isEmployer:isEmployer(req.user?.id,job.userId),
+                userInSession,
+                aplicated
             })
-
-
         }
 
         //este metodo va a apuntar a otra vista

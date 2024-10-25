@@ -5,11 +5,14 @@ import Price from "./Price.js";
 import User from "./User.js"
 import Resume from "./Resume.js";
 import Message from "./Message.js";
-
+import Shift from "./Shift.js";
+import Language from "./Language.js";
 Job.belongsTo(Price,{foreignKey:'priceId'})
 Job.belongsTo(Category,{foreignKey:'categoryId'})
 Job.belongsTo(Skill,{foreignKey:'skillId'})
 Job.belongsTo(User,{foreignKey:'userId'})
+Job.belongsTo(Shift,{foreignKey:'shiftId'})
+Job.belongsTo(Language,{foreignKey:'languageId'})
 
 Job.hasMany(Resume,{foreignKey:'jobId',as:'resumes'})
 Job.hasMany(Message,{foreignKey:'jobId',as:'messages'})
@@ -27,5 +30,7 @@ export{
     Price,
     Skill,
     Resume,
-    Message
+    Message,
+    Shift,
+    Language
 }

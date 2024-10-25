@@ -3,7 +3,9 @@ import skills from "./skills.js";
 import prices from "./price.js";
 import user from "./user.js";
 import db from '../config/dba.js'
-import {Skill,Category,Price,User} from "../models/index.js"
+import {Skill,Category,Price,User,Language,Shift} from "../models/index.js"
+import shifts from "./shift.js";
+import languages from "./language.js";
 
 const importarDatos= async ()=>{
     try{
@@ -16,7 +18,10 @@ const importarDatos= async ()=>{
             Category.bulkCreate(categorys),
             Price.bulkCreate(prices),
             Skill.bulkCreate(skills),
-            User.bulkCreate(user)
+            User.bulkCreate(user),
+            Shift.bulkCreate(shifts),
+            Language.bulkCreate(languages),
+
         ]);
         console.log('Datos Importados Correctamente');
         process.exit();// terminar los procesos pero no hubo errores 

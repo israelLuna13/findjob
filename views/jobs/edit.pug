@@ -4,8 +4,7 @@ block styles
 block contenido
 
     div.py-10 
-        h1.text-4xl.my-10.font-extrabold.text-center.text-white Find 
-            span.font-normal Job
+        h1.text-4xl.my-10.font-extrabold.text-center.text-white Jobs
         h2.text-center.text-2xl.font-extrabold.text-white= page
         if errores
             div(class="max-w-md mx-auto my-10")
@@ -23,7 +22,12 @@ block contenido
                         input#title.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Title job" type="text" name="title" value=data.title ? data.title:'')  
                     div 
                         label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="description") Description job 
-                        textarea#description.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(type="text" name="description" value=data.description ? data.description:'')  
+                        textarea#description.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400( name="description")=data.description ? data.description:''  
+
+                    div 
+                        label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="benefit") Benefit job
+                        textarea#benefit.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="benefit")
+                            = data.benefit ? data.benefit : ''
 
                     div 
                         label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="company") company
@@ -38,13 +42,31 @@ block contenido
                                 option(value="") - Seleccione -
                                 each category in categorys
                                     option(value=category.id selected= data.categoryId ? data.categoryId == category.id ? true : false : null)= category.name
+
+                        div(class="md:w-1/2") 
+                            label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="language") language
+                            select#language.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="language")  
+                                option(value="") - Seleccione -
+                                each language in languages
+                                    option(value=language.id selected= data.languageId ? data.languageId == language.id ? true : false: null)= language.name
+                    
+                    
+                        
+                    div(class="md:flex md:gap-4 space-y-5 md:space-y-0")
+                        div(class="md:w-1/2") 
+                            label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="shift") Type of employment
+                            select#shift.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="shift")  
+                                option(value="") - Seleccione -
+                                each shift in shifts
+                                    option(value=shift.id selected= data.shiftId ? data.shiftId == shift.id ? true : false: null)= shift.name
+
                         div(class="md:w-1/2") 
                             label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="price") Sueldo
                             select#price.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="price")  
                                 option(value="") - Seleccione -
                                 each price in prices
                                     option(value=price.id selected= data.priceId ? data.priceId == price.id ? true : false : null)= price.name
-                    div(class="md:flex md:gap-4 space-y-5 md:space-y-0")
+
                         div(class="md:w-1/3") 
                             label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="skill") Skills:
                                 select#skill(name="skill[]", multiple=true, class="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400")

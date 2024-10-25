@@ -76,9 +76,9 @@ export class AppController{
     }
     static search = async(req,res)=>{
         const {termino} = req.body
-
-        if(!termino.trim())
-            return res,redirect('back')
+        if(!termino.trim()){
+            return res.redirect('/')
+        }        
         //search job by name of search
         const jobs = await Job.findAll({
             where:{

@@ -7,6 +7,8 @@ export default{
         mapHome:'./src/js/mapHome.js',
         addResume:'./src/js/addResume.js',
         changeState:'./src/js/changeState.js',
+        notification:'./src/js/notification.js',
+        delete:'./src/js/delete.js',
 
 
     },
