@@ -17,3 +17,7 @@
 
 > [!CAUTION]
 > Advises about risks or negative outcomes of certain actions.
+
+> [!NOTE]
+> Vista de registro , contiene validaciones
+![image](https://github.com/user-attachments/assets/c07e8275-7249-4f46-b1a6-d17d64628f1d)
