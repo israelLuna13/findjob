@@ -8,13 +8,15 @@ block contenido
             ul
                 each resum in resume
                     div(class="p-6 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between space-8-y md:space-y-0 gap-4")
-                        div(class="bg-white w-full")
-                            li(class="border-gray-800 border-b p-2") Look resume
-                            p(class="font-bold text-black") Name: 
-                                span(class="font-normal")= resum.user.name
-                            p(class="font-bold text-black") Email: 
-                                span(class="font-normal")= resum.user.email
-                            p(class="font-bold text-black") Enviado:
-                                span(class="font-normal")= formatearFecha(resum.createdAt)
+                        div(class="bg-white w-full rounded-xl")
+                            li(class="border-gray-800 border-b p-2 ")
+                                a(href=`/uploads/${resum.resume}` target="_blank" rel="noopener noreferrer") Look resume 
+                            div(class="m-5")
+                                p(class="font-bold text-black m-2") Name: 
+                                    span(class="font-normal")= resum.user.name
+                                p(class="font-bold text-black m-2") Email: 
+                                    span(class="font-normal")= resum.user.email
+                                p(class="font-bold text-black m-2") Enviado:
+                                    span(class="font-normal")= formatearFecha(resum.createdAt)
         else
             p(class="text-center text-white") There is not resumes

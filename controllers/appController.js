@@ -3,9 +3,7 @@ import { Sequelize } from "sequelize"
 
 export class AppController{
     static home = async(req,res)=>{
-        // const min = 1;
-        // const max = 5;
-        // const random = Math.floor(Math.random() *(max - min + 1)) + min;
+
         const[categorys,prices,skills,jobs] = await Promise.all([
             Category.findAll({raw:true}),
             Price.findAll({raw:true}),
@@ -42,6 +40,8 @@ export class AppController{
     }
     static categorys = async(req,res)=>{
         const {id} = req.params
+        let userInSession
+        (req.user != null ? userInSession = true: userInSession = false)
 
         const category=await Category.findByPk(id)
 
@@ -60,25 +60,32 @@ export class AppController{
         res.render('category',{
             page:`${category.name}`,
             jobs,
-            csrfToken:req.csrfToken()
+            csrfToken:req.csrfToken(),
+            userInSession
         })
         
 
     }
     static notFound = async(req,res)=>{
+        let userInSession
+        (req.user != null ? userInSession = true: userInSession = false)
 
         res.render('404',{
             page:'Not found',
-            csrfToken:req.csrfToken()
+            csrfToken:req.csrfToken(),
+            userInSession
 
         })
 
     }
     static search = async(req,res)=>{
         const {termino} = req.body
-        if(!termino.trim()){
+        let userInSession
+        (req.user != null ? userInSession = true: userInSession = false)
+
+        if(!termino.trim())
             return res.redirect('/')
-        }        
+        
         //search job by name of search
         const jobs = await Job.findAll({
             where:{
@@ -94,9 +101,8 @@ export class AppController{
         res.render('search',{
             page:'Results of search',
             jobs,
-            csrfToken:req.csrfToken()
-
+            csrfToken:req.csrfToken(),
+            userInSession
         })
-
     }
 }

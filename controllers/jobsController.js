@@ -3,6 +3,8 @@ import {Price,Category,Job,Skill, Message, User, Resume, Shift, Language} from '
 import { validationResult } from "express-validator"
 import { formatearFecha, isEmployer } from '../helpers/index.js'
 import { resumeUpload } from '../helpers/emails.js'
+import { col, fn } from "sequelize";
+
 export class jobsController{
     static admin = async(req,res)=>{
         //query string
@@ -48,7 +50,8 @@ export class jobsController{
                 currentPage:Number(currentPage),
                 offset,
                 limit,
-                total
+                total,
+                id
 
             })
           } catch (error) {
@@ -74,34 +77,21 @@ export class jobsController{
             skills,
             prices,
             shifts,
-            languages
+            languages,
+            id:req.user.id
 
         })
     }
     static addResume = async(req,res)=>{
         const {id} = req.params
-        // const {id:idUser} = req.user
-        // let aplicated = false
-        // const resume = await Resume.findByPk(idUser)
         const job = await Job.findByPk(id)
 
-        // if(idUser == resume.userId && id == resume.jobId){
-        //     aplicated = true
-
-        // }
-       
-        
-        if(!job){
+        if(!job)
             return res.redirect('my-jobs')
-        }
 
-        if(!job.published){
+        if(!job.published)
             return res.redirect('/my-jobs')
-        }
         
-        // if(req.user.id.toString() !== job.userId.toString()){
-        //     return res.redirect('/my-jobs')
-        // }
         res.render('jobs/add-resume',{
             page:`Add resume at ${job.title}`,
             csrfToken:req.csrfToken(),
@@ -113,19 +103,17 @@ export class jobsController{
  
         const job = await Job.findByPk(id,{
             include:[
-                {model:User,as:'user'}
+                {model:User.scope('deletePassword'),as:'user'}
             ]
         })
         if(!job)
             return res.redirect('/my-jobs')
         
-        // if(job.published)
-        //     return res.redirect('/my-jobs')
-        // console.log("SI ESTA PUBLICADO");
+        if(!job.published)
+            return res.redirect('/my-jobs')
         
         try {
             const resume= req.file.filename
-            
             const { id: jobId } = req.params;
             const { id: userId } = req.user;
             await Resume.create({
@@ -146,14 +134,11 @@ export class jobsController{
                 employer,
                 email
             })
-             
-            next()
+            next()//next middleware
         } catch (error) {
             console.log(error);
         }
     }
-
-    //arreglar : insertar id del lenguage del trabajo y del tipo de trabajo
     static  save = async(req,res)=>
     {
         let result = validationResult(req)
@@ -179,12 +164,11 @@ export class jobsController{
             })
         }
 
-        //all well
+        //all is good
         const {title,description,benefit,shift:shiftId,language:languageId,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
 
         const {id:userId} = req.user
-        
-
+    
         try {
             
               await Job.create({
@@ -203,8 +187,6 @@ export class jobsController{
                 languageId,
                 published:true
             })
-           // const {id} = jobSaved
-
             res.redirect('/my-jobs')
         } catch (error) {
             console.log(error);   
@@ -227,6 +209,7 @@ export class jobsController{
         if(!job){
             return res.redirect('/my-jobs')
         }
+        //if user in session is not the user that create the job
         if(job.userId.toString() !== req.user.id.toString()){
             return res.redirect('/my-jobs')
         }
@@ -239,9 +222,6 @@ export class jobsController{
             Language.findAll(),
         ]);
 
-        console.log(job);
-        
-
         res.render('jobs/edit',{
             page:`Edit ${job.title}`,
             csrfToken:req.csrfToken(),
@@ -250,7 +230,8 @@ export class jobsController{
             skills,
             data:job,
             languages,
-            shifts
+            shifts,
+            id:req.user.id
         })
     }
 
@@ -286,14 +267,13 @@ export class jobsController{
                 return res.redirect('/my-jobs')
             }
 
+            //if user in session is not the user that create the job
             if(job.userId.toString() !== req.user.id.toString()){
                 return res.redirect('/my-jobs')
             }
 
             try {
                 const {title,description,benefit,shift:shiftId,language:languageId,company,calle,lat,lng,category:categoryId,price:priceId,skill:skillId}= req.body
-
-                
                     job.set({
                     title,
                     description,
@@ -308,9 +288,7 @@ export class jobsController{
                     shiftId,
                     languageId
                 })
-
                 await job.save()
-               // const {id} = jobSaved
                 res.redirect('/my-jobs')
             } catch (error) {
                 console.log(error);   
@@ -327,6 +305,7 @@ export class jobsController{
                 return res.redirect('/my-jobs')
             }
 
+            //if user in session is not the user that create the job
             if(job.userId.toString() !== req.user.id.toString()){
                 return res.redirect('/my-jobs')
             }
@@ -356,18 +335,17 @@ export class jobsController{
                     ]
                 }
             )
-            if(resume){
-                if(idUser == resume.userId && id == resume.jobId){
+          //  If the user has already uploaded the resume to the job           
+           if(resume){
+                if(idUser == resume.userId && id == resume.jobId)
                     aplicated = true
-                }
             }
             
-           
-
             if(!job || !job.published){
                 return res.redirect('/404')
             }    
             let userInSession
+            // if there is user in session
             (req.user != null ? userInSession = true: userInSession = false)
             
             res.render('jobs/show',{
@@ -377,7 +355,8 @@ export class jobsController{
                 user:req.user,
                 isEmployer:isEmployer(req.user?.id,job.userId),
                 userInSession,
-                aplicated
+                aplicated,
+                id:req.user.id
             })
         }
 
@@ -448,8 +427,7 @@ export class jobsController{
             const job = await Job.findByPk(id,{
                 include:[
                     {
-                        model:Resume,
-                        as:'resumes',
+                        model:Resume,as:'resumes',
                         include:[{model:User.scope("deletePassword"),as:"user"}]
                     }
                 ]
@@ -467,12 +445,10 @@ export class jobsController{
         
         static changeState = async(req,res)=>{
             const {id} = req.params
-
             const job = await Job.findByPk(id)
 
             if(!job)
                 return res.redirect("/my-jobs")
-            console.log(res.user);
             
             if(job.userId.toString() !== req.user.id.toString())
                 return res.redirect("/my-jobs")
@@ -484,4 +460,113 @@ export class jobsController{
              })
 
         }
+
+        //-------------profile
+        static lookProfile =async (req,res)=>{
+            const {id} = req.params 
+            if(id != req.user.id)
+                return res.redirect("/my-jobs")
+
+            const [user,total] = await Promise.all([
+                User.findByPk(id),
+                Job.count({
+                    where:{
+                        userId:id
+                    }
+                })
+            ])
+  let totalMensajes = 0
+  //si no hay cv 
+  if(total != 0) // contamos los cv que tiene el usuario en sus jobs
+  {
+     const resumes =
+     await Job.findAll({
+      where: {
+        userId:id // Filtramos las jobs por el ID del usuario
+      },
+      include: [
+        {
+          model: Resume,
+          as: 'resumes',
+          attributes: [] // No necesitamos los atributos de los cv
+        }
+      ],
+      attributes: [
+        [fn('COUNT',col('resumes.id')), 'resumes'] // Contamos los cv
+      ],
+      raw: true // Devuelve los datos en formato plano
+    });
+    totalMensajes = resumes[0].resumes
+  }
+
+            if(!user)
+                return res.redirect("/my-jobs")
+
+            const {name,email} = user
+            return res.render("jobs/profile",{
+                    name,
+                    email,
+                    id,
+                    total,
+                    totalMensajes,
+                    csrfToken: req.csrfToken(),
+                })
+        }
+
+
+        static showForm = async(req,res)=>{
+            const {id} = req.params
+            if(id != req.user.id)
+                return res.redirect("/my-jobs")
+            const user = await User.findByPk(id)
+            if(!user)
+                return res.redirect("/my-jobs")
+
+            return res.render('jobs/formEdit',{
+                csrfToken: req.csrfToken(),
+                data:user,
+                page:"Edit information"
+            })
+        }
+
+        static editProfile=async(req,res)=>{
+            const {id} = req.params
+            if(id != req.user.id)
+                return res.redirect("/my-jobs")
+
+            let result = validationResult(req)
+            if(!result.isEmpty()){
+                return res.render('jobs/formEdit',{
+                    csrfToken: req.csrfToken(),
+                    id,
+                    errores:result.array(),
+                    page:'Edit information',
+                    data:req.body
+                })
+            }
+
+            const user = await User.findByPk(id)
+            if(!user)
+                return res.redirect('/my-jobs`')
+
+            try {
+                const {name:nameDb, email:emailDb,id} = user
+                const {name,email} = req.body
+                if(nameDb == name && emailDb == email)
+                    return res.redirect(`/profile/${id}`)
+                if(name != nameDb)
+                    user.set({name})
+                if(email != emailDb)
+                    user.set({email})
+                await user.save()
+                res.redirect(`/profile/${id}`)
+            } catch (error) {
+                console.log(error);
+                
+            }
+                
+        }
+
+
+
 }

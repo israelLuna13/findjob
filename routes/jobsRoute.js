@@ -49,5 +49,11 @@ router.post('/jobs/:id',identifyUser, body('message').isLength({min:10}).withMes
 router.get('/messages/:id',protectRute,jobsController.lookMessage)  
 router.get('/resumes/:id',protectRute,jobsController.lookResumes)  
 
+//profile
+router.get('/profile/:id',protectRute,jobsController.lookProfile)
+router.get('/edit-profile/:id', protectRute,jobsController.showForm)
+router.post('/edit-profile/:id', protectRute,
+            body('name').notEmpty().withMessage('The name is required'),
+            body('email').isEmail().withMessage('The email is required'),jobsController.editProfile)
 
 export default router

@@ -13,7 +13,6 @@ export class AuthController {
                 csrfToken:req.csrfToken(),
                 page:'Login'
             })
-
         }
         res.redirect('/my-jobs')
     }

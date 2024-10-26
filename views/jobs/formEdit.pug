@@ -1,0 +1,31 @@
+extends ../layout/admin
+block styles 
+    link(rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css")
+block contenido
+         div.py-10 
+                h1.text-4xl.my-10.font-extrabold.text-center.text-white Find 
+                h2.text-center.text-2xl.font-extrabold.text-white= page
+         if errores
+                div(class="max-w-md mx-auto my-10")
+                    each error in errores
+                        p(class="bg-red-600 text-white uppercase text-xs text-center p-2 mb-1 font-bold")= error.msg
+
+         div.mt-8.mx-auto.max-w-md
+            div.bg-white.py-8.px-4.shadow
+             form.space-y-5(method="POST")
+                input(type="hidden" name="_csrf" value=csrfToken)
+                div 
+                    label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="name") Name 
+                    input#name.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Your name" type="text" name="name" value=data.name )
+                div 
+                    label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="email") Email 
+                    input#email.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu Email" type="email" name="email" value=data.email )    
+                //- div 
+                //-     label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="password") Current password
+                //-     input#password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu password" type="password" name="password")    
+                //- div 
+                //-     label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="repetir_password") New password
+                //-     input#repetir_password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Repite tu password" type="password" name="repetir_password")   
+                
+            
+                input(class ="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Save changes") 
