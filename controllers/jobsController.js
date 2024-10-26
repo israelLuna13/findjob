@@ -17,7 +17,7 @@ export class jobsController{
           }
           try {
             const {id} = req.user
-            const limit = 5 // jobs by page
+            const limit = 3 // jobs by page
             const offset = (currentPage * limit) - limit 
             const [jobs,total] = await Promise.all([
                 Job.findAll({
@@ -93,7 +93,7 @@ export class jobsController{
             return res.redirect('/my-jobs')
         
         res.render('jobs/add-resume',{
-            page:`Add resume at ${job.title}`,
+            page:`Add resume in ${job.title}`,
             csrfToken:req.csrfToken(),
             job
         })

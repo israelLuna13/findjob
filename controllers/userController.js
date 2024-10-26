@@ -105,7 +105,9 @@ export class AuthController {
             return res.render('auth/user-register',{
                 pagina:'Create account',
                 errores:result.array(),
-                name:{
+                csrfToken:req.csrfToken(),
+
+                user:{
                     name:req.body.name,
                     email:req.body.email
                 }
@@ -142,8 +144,8 @@ export class AuthController {
 
         })
         res.render("templates/message", {
-            page: "Account created sussessfully",
-            message: "We have sent a email confirmation",
+            page: "Account created successfully",
+            message: "We have sent a confirmation email",
           });
     }
 
@@ -167,8 +169,8 @@ export class AuthController {
 
     await user.save()
     res.render('auth/user-confirm-account',{
-        page:'Account confirmed',
-        message:'Account confirmed successfully'
+        page:'Confirmed account',
+        message:'Successfully confirmed account'
     })
     }
 

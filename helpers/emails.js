@@ -22,11 +22,11 @@ const registerEmail = async(data)=>
         text:'Confirm account in FindJob.com',
         html: `
                 <p>Hello ${name},confirm your account in FindJob.com</p>
-                <p>Your does account is already, just follow the link:
+                <p>Your account is already there, just follow the link:
                 <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/confirm/${token}">
                 Confirm account</a>
                 </p>
-                <p>If you didn't create the account can you ingnore the message</p> 
+                <p>If you didn't create the account, You can ingnore the message</p> 
              `
     })
 }
@@ -58,7 +58,7 @@ const emailForgotPassword = async(data)=>
                     <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 3000}/auth/change-password/${token}">
                     Change password</a>
                     </p>
-                    <p>If you didn't create the account can you ingnore the message</p> 
+                    <p>If you didn't create the account, You can ingnore the message</p> 
                  `
         })
     }

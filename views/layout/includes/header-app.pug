@@ -10,7 +10,7 @@ header.bg-blue-600.py-4
          else
             nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white")
                 a(href="/my-jobs") My jobs
-                form(method="POST" action="auth/logout") 
+                form(method="POST" action="/auth/logout") 
                     input(type="hidden" name="_csrf" value=csrfToken)
                     input(type="submit" class="bg-blue-800 py-2 px-10 rounded-lg cursor-pointer" value="Logout")
 
@@ -20,7 +20,7 @@ header.bg-blue-600.py-4
             form(action="/search" method="POST" class="flex gap-3 items-center") 
                 input(type="hidden" name="_csrf" value=csrfToken) 
                 label(for="termino" class="text-sm uppercase font-bold text-white") Search 
-                input(type="text" id="termino" name="termino" placeholder="Search jobs" class="p-2 px-20 py-5 rounded-lg shadow text-sm" )
+                input(type="text" id="termino" name="termino" placeholder="look for a job" class="p-2 px-20 py-5 rounded-lg shadow text-sm" )
                 input(type="submit" class="bg-blue-800 hover:bg-blue-400 rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm" value="Search")
 
             

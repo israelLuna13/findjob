@@ -17,7 +17,7 @@ block contenido
              form.space-y-5(method="POST" action="/auth/register")
                 input(type="hidden" name="_csrf" value=csrfToken)
                 div 
-                    label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="name") Your Name
+                    label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="name")  Name
                     input#name.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Your Name" type="text" name="name" value=user ? user.name:'')
                 div 
                     label.block.text-sm.uppercase.text-gray-800.mb-2.font-bold(for="email") Email
@@ -32,6 +32,6 @@ block contenido
                 
                 div(class="flex items-center justify-between")
                     a.text-gray-500.text-xs(href="/auth/login") Do you have account? Login
-                    a.text-gray-500.text-xs(href="/auth/change-password") You forgot you password
-                
+                    a.text-gray-500.text-xs(href="/auth/change-password") Forgot your password?
+                 
                 input(class ="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Create account") 
